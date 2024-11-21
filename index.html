@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,9 +22,6 @@
                     <option value="fijo">Término Fijo</option>
                     <option value="indefinido">Término Indefinido</option>
                 </select>
-
-                <label for="salary">Salario Mensual:</label>
-                <input type="number" id="salary" name="salary" step="0.01" required>
 
                 <label for="start-date">Fecha de Inicio:</label>
                 <input type="date" id="start-date" name="startDate" required>
@@ -57,52 +54,6 @@
             </table>
         </section>
     </main>
-    <script>
-        document.getElementById('liquidation-form').addEventListener('submit', function(event) {
-            event.preventDefault();
-            
-            // Recuperar datos del formulario
-            const salary = parseFloat(document.getElementById('salary').value) || 0; // Salario mensual
-            const startDate = new Date(document.getElementById('start-date').value); // Fecha de inicio
-            const endDate = new Date(document.getElementById('end-date').value); // Fecha de fin
-
-            // Asegurarse de que las fechas son correctas
-            if (startDate > endDate) {
-                alert("La fecha de inicio no puede ser posterior a la fecha de fin.");
-                return;
-            }
-
-            // Calcular días trabajados
-            const timeDifference = endDate - startDate; // Diferencia en milisegundos
-            const daysWorked = Math.ceil(timeDifference / (1000 * 60 * 60 * 24)); // Convertir a días
-
-            // Si los días trabajados son menores o iguales a cero, mostrar un mensaje de error
-            if (daysWorked <= 0) {
-                alert("Las fechas proporcionadas no son válidas. Por favor, asegúrate de que la fecha de fin sea posterior a la fecha de inicio.");
-                return;
-            }
-
-            // Calcular conceptos
-            const vacaciones = ((salary / 30) * (daysWorked / 360) * 15).toFixed(2);
-            const cesantias = ((salary / 30) * daysWorked).toFixed(2);
-            const interesesCesantias = (cesantias * 0.12).toFixed(2);
-
-            // Actualizar resultados
-            const results = [
-                { concept: 'Vacaciones', value: `$${vacaciones}` },
-                { concept: 'Cesantías', value: `$${cesantias}` },
-                { concept: 'Intereses de Cesantías', value: `$${interesesCesantias}` }
-            ];
-            
-            // Actualizar tabla de resultados
-            const resultsTableBody = document.getElementById('results-table-body');
-            resultsTableBody.innerHTML = '';
-            results.forEach(result => {
-                const row = document.createElement('tr');
-                row.innerHTML = `<td>${result.concept}</td><td>${result.value}</td>`;
-                resultsTableBody.appendChild(row);
-            });
-        });
-    </script>
+    <script src="scripts.js"></script>
 </body>
 </html>
