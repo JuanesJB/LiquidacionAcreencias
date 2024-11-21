@@ -36,7 +36,7 @@ function formatSalaryInput(input) {
 function formatWithThousands(value) {
     const number = parseFloat(value);
     if (isNaN(number)) return '$0';
-    return $${new Intl.NumberFormat('es-CO').format(number)};
+    return `$${new Intl.NumberFormat('es-CO').format(number)}`;
 }
 
 document.getElementById('salary').addEventListener('input', function () {
@@ -90,7 +90,7 @@ document.getElementById('liquidation-form').addEventListener('submit', function(
     resultsTableBody.innerHTML = ''; // Limpiar los resultados previos
     results.forEach(result => {
         const row = document.createElement('tr');
-        row.innerHTML = <td>${result.concept}</td><td>${result.value}</td>;
+        row.innerHTML = `<td>${result.concept}</td><td>${result.value}</td>`;
         resultsTableBody.appendChild(row);
     });
 
