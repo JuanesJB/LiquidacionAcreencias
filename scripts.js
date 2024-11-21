@@ -24,6 +24,25 @@
 </table>
 
 <script>
+// Función para formatear el salario con el símbolo $ y la puntuación adecuada
+function formatSalaryInput(input) {
+    let value = input.value.replace(/[^\d]/g, ''); // Eliminar caracteres no numéricos
+    if (value) {
+        input.value = '$' + value.replace(/\B(?=(\d{3})+(?!\d))/g, '.'); // Añadir puntos de miles
+    }
+}
+
+// Función para formatear valores con puntos de miles y símbolo $
+function formatWithThousands(value) {
+    const number = parseFloat(value);
+    if (isNaN(number)) return '$0';
+    return `$${new Intl.NumberFormat('es-CO').format(number)}`;
+}
+
+document.getElementById('salary').addEventListener('input', function () {
+    formatSalaryInput(this); // Llamada cada vez que el usuario ingrese un valor en el campo de salario
+});
+
 document.getElementById('liquidation-form').addEventListener('submit', function(event) {
     event.preventDefault();
     
@@ -58,13 +77,6 @@ document.getElementById('liquidation-form').addEventListener('submit', function(
     const vacaciones = ((salary / 30) * (daysWorked / 360) * 15).toFixed(0);  // Liquidación de vacaciones
     const cesantias = ((salary / 30) * daysWorked).toFixed(0);  // Liquidación de cesantías
     const interesesCesantias = (cesantias * 0.12).toFixed(0);  // Intereses de cesantías
-
-    // Función para formatear los valores con puntos de miles
-    function formatWithThousands(value) {
-        const number = parseFloat(value);
-        if (isNaN(number)) return '$0';
-        return `$${new Intl.NumberFormat('es-CO').format(number)}`;
-    }
 
     // Actualizar resultados con formato adecuado
     const results = [
