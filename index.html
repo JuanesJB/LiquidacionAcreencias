@@ -66,9 +66,21 @@
             const startDate = new Date(document.getElementById('start-date').value); // Fecha de inicio
             const endDate = new Date(document.getElementById('end-date').value); // Fecha de fin
 
+            // Asegurarse de que las fechas son correctas
+            if (startDate > endDate) {
+                alert("La fecha de inicio no puede ser posterior a la fecha de fin.");
+                return;
+            }
+
             // Calcular días trabajados
             const timeDifference = endDate - startDate; // Diferencia en milisegundos
             const daysWorked = Math.ceil(timeDifference / (1000 * 60 * 60 * 24)); // Convertir a días
+
+            // Si los días trabajados son menores o iguales a cero, mostrar un mensaje de error
+            if (daysWorked <= 0) {
+                alert("Las fechas proporcionadas no son válidas. Por favor, asegúrate de que la fecha de fin sea posterior a la fecha de inicio.");
+                return;
+            }
 
             // Calcular conceptos
             const vacaciones = ((salary / 30) * (daysWorked / 360) * 15).toFixed(2);
