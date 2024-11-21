@@ -1,29 +1,3 @@
-<form id="liquidation-form">
-    <label for="salary">Salario mensual (Ej: $10.000.000):</label>
-    <input type="text" id="salary" placeholder="Ejemplo: $10.000.000" required><br><br>
-    
-    <label for="start-date">Fecha de inicio:</label>
-    <input type="date" id="start-date" required><br><br>
-    
-    <label for="end-date">Fecha de fin:</label>
-    <input type="date" id="end-date" required><br><br>
-    
-    <button type="submit">Calcular</button>
-</form>
-
-<table>
-    <thead>
-        <tr>
-            <th>Concepto</th>
-            <th>Valor</th>
-        </tr>
-    </thead>
-    <tbody id="results-table-body">
-        <!-- Resultados se agregarán aquí -->
-    </tbody>
-</table>
-
-<script>
 // Función para formatear el salario con el símbolo $ y la puntuación adecuada
 function formatSalaryInput(input) {
     let value = input.value.replace(/[^\d]/g, ''); // Eliminar caracteres no numéricos
@@ -39,10 +13,12 @@ function formatWithThousands(value) {
     return `$${new Intl.NumberFormat('es-CO').format(number)}`;
 }
 
+// Asignar el evento de input al campo de salario
 document.getElementById('salary').addEventListener('input', function () {
     formatSalaryInput(this); // Llamada cada vez que el usuario ingrese un valor en el campo de salario
 });
 
+// Manejo de la sumisión del formulario
 document.getElementById('liquidation-form').addEventListener('submit', function(event) {
     event.preventDefault();
     
@@ -97,4 +73,3 @@ document.getElementById('liquidation-form').addEventListener('submit', function(
     // Limpiar el formulario después de la acción (opcional)
     document.getElementById('liquidation-form').reset(); // Limpia los campos de entrada después de enviar
 });
-</script>
