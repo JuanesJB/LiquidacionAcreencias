@@ -1,108 +1,100 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Liquidación de Acreencias Laborales</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <header>
-        <h1>Liquidación de Acreencias Laborales</h1>
-    </header>
-    <main>
-        <section id="input-form">
-            <h2>Formulario de Entrada</h2>
-            <form id="liquidation-form">
-                <label for="employee-name">Nombre del Empleado:</label>
-                <input type="text" id="employee-name" name="employeeName" required>
+<form id="liquidation-form">
+    <label for="salary">Salario mensual (Ej: $10.000.000):</label><br>
+    <input type="text" id="salary" placeholder="Ejemplo: $10.000.000" required><br><br>
+    
+    <label for="start-date">Fecha de inicio:</label><br>
+    <input type="date" id="start-date" required><br><br>
+    
+    <label for="end-date">Fecha de fin:</label><br>
+    <input type="date" id="end-date" required><br><br>
+    
+    <button type="submit">Calcular</button>
+</form>
 
-                <label for="contract-type">Tipo de Contrato:</label>
-                <select id="contract-type" name="contractType" required>
-                    <option value="fijo">Término Fijo</option>
-                    <option value="indefinido">Término Indefinido</option>
-                </select>
+<table>
+    <thead>
+        <tr>
+            <th>Concepto</th>
+            <th>Valor</th>
+        </tr>
+    </thead>
+    <tbody id="results-table-body">
+        <!-- Resultados se agregarán aquí -->
+    </tbody>
+</table>
 
-                <label for="salary">Salario Mensual:</label>
-                <input type="number" id="salary" name="salary" step="0.01" required>
+<script>
+    // Función para formatear el salario con el símbolo $ y la puntuación adecuada
+    function formatSalaryInput(input) {
+        let value = input.value.replace(/[^\d]/g, ''); // Eliminar caracteres no numéricos
+        if (value) {
+            input.value = '$' + value.replace(/\B(?=(\d{3})+(?!\d))/g, '.'); // Añadir puntos de miles
+        }
+    }
 
-                <label for="start-date">Fecha de Inicio:</label>
-                <input type="date" id="start-date" name="startDate" required>
+    // Función para formatear valores con puntos de miles y símbolo $
+    function formatWithThousands(value) {
+        const number = parseFloat(value);
+        if (isNaN(number)) return '$0';
+        return `$${new Intl.NumberFormat('es-CO').format(number)}`;
+    }
 
-                <label for="end-date">Fecha de Terminación:</label>
-                <input type="date" id="end-date" name="endDate" required>
+    document.getElementById('salary').addEventListener('input', function () {
+        formatSalaryInput(this); // Llamada cada vez que el usuario ingrese un valor en el campo de salario
+    });
 
-                <label for="termination-reason">Motivo de Terminación:</label>
-                <select id="termination-reason" name="terminationReason" required>
-                    <option value="sinJustaCausa">Sin Justa Causa</option>
-                    <option value="conJustaCausa">Con Justa Causa</option>
-                    <option value="voluntario">Retiro Voluntario</option>
-                </select>
+    document.getElementById('liquidation-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        
+        // Recuperar datos del formulario
+        let salary = document.getElementById('salary').value.trim();
+        salary = parseFloat(salary.replace(/[^\d.-]/g, '')) || 0; // Eliminar cualquier caracter no numérico y convertir a número
+        const startDate = new Date(document.getElementById('start-date').value); // Fecha de inicio
+        const endDate = new Date(document.getElementById('end-date').value); // Fecha de fin
+        
+        // Verificar si las fechas son válidas y la fecha de fin es posterior a la fecha de inicio
+        if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+            alert("Por favor, ingrese fechas válidas.");
+            return;
+        }
 
-                <button type="submit">Calcular</button>
-            </form>
-        </section>
-        <section id="results">
-            <h2>Resultados</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Concepto</th>
-                        <th>Valor</th>
-                    </tr>
-                </thead>
-                <tbody id="results-table-body">
-                    <!-- Resultados aparecerán aquí -->
-                </tbody>
-            </table>
-        </section>
-    </main>
-    <script>
-        document.getElementById('liquidation-form').addEventListener('submit', function(event) {
-            event.preventDefault();
-            
-            // Recuperar datos del formulario
-            const salary = parseFloat(document.getElementById('salary').value) || 0; // Salario mensual
-            const startDate = new Date(document.getElementById('start-date').value); // Fecha de inicio
-            const endDate = new Date(document.getElementById('end-date').value); // Fecha de fin
+        if (endDate < startDate) {
+            alert("La fecha de terminación no puede ser anterior a la fecha de inicio.");
+            return;
+        }
 
-            // Asegurarse de que las fechas son correctas
-            if (startDate > endDate) {
-                alert("La fecha de inicio no puede ser posterior a la fecha de fin.");
-                return;
-            }
+        // Calcular días trabajados
+        const timeDifference = endDate - startDate; // Diferencia en milisegundos
+        const daysWorked = Math.ceil(timeDifference / (1000 * 60 * 60 * 24)); // Convertir a días
 
-            // Calcular días trabajados
-            const timeDifference = endDate - startDate; // Diferencia en milisegundos
-            const daysWorked = Math.ceil(timeDifference / (1000 * 60 * 60 * 24)); // Convertir a días
+        // Evitar valores negativos si las fechas son demasiado cercanas
+        if (daysWorked <= 0) {
+            alert("El número de días trabajados no es válido.");
+            return;
+        }
 
-            // Si los días trabajados son menores o iguales a cero, mostrar un mensaje de error
-            if (daysWorked <= 0) {
-                alert("Las fechas proporcionadas no son válidas. Por favor, asegúrate de que la fecha de fin sea posterior a la fecha de inicio.");
-                return;
-            }
+        // Calcular conceptos
+        const vacaciones = ((salary / 30) * (daysWorked / 360) * 15).toFixed(0);  // Liquidación de vacaciones
+        const cesantias = ((salary / 30) * daysWorked).toFixed(0);  // Liquidación de cesantías
+        const interesesCesantias = (cesantias * 0.12).toFixed(0);  // Intereses de cesantías
 
-            // Calcular conceptos
-            const vacaciones = ((salary / 30) * (daysWorked / 360) * 15).toFixed(2);
-            const cesantias = ((salary / 30) * daysWorked).toFixed(2);
-            const interesesCesantias = (cesantias * 0.12).toFixed(2);
-
-            // Actualizar resultados
-            const results = [
-                { concept: 'Vacaciones', value: `$${vacaciones}` },
-                { concept: 'Cesantías', value: `$${cesantias}` },
-                { concept: 'Intereses de Cesantías', value: `$${interesesCesantias}` }
-            ];
-            
-            // Actualizar tabla de resultados
-            const resultsTableBody = document.getElementById('results-table-body');
-            resultsTableBody.innerHTML = '';
-            results.forEach(result => {
-                const row = document.createElement('tr');
-                row.innerHTML = `<td>${result.concept}</td><td>${result.value}</td>`;
-                resultsTableBody.appendChild(row);
-            });
+        // Actualizar resultados con formato adecuado
+        const results = [
+            { concept: 'Vacaciones', value: formatWithThousands(vacaciones) },
+            { concept: 'Cesantías', value: formatWithThousands(cesantias) },
+            { concept: 'Intereses de Cesantías', value: formatWithThousands(interesesCesantias) }
+        ];
+        
+        // Actualizar tabla de resultados
+        const resultsTableBody = document.getElementById('results-table-body');
+        resultsTableBody.innerHTML = ''; // Limpiar los resultados previos
+        results.forEach(result => {
+            const row = document.createElement('tr');
+            row.innerHTML = `<td>${result.concept}</td><td>${result.value}</td>`;
+            resultsTableBody.appendChild(row);
         });
-    </script>
-</body>
-</html>
+
+        // Limpiar el formulario después de la acción (opcional)
+        document.getElementById('liquidation-form').reset(); // Limpia los campos de entrada después de enviar
+    });
+</script>
