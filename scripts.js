@@ -32,19 +32,30 @@ document.getElementById('liquidation-form').addEventListener('submit', function(
     const cesantias = ((salary / 30) * daysWorked).toFixed(2);  // Liquidación de cesantías
     const interesesCesantias = (cesantias * 0.12).toFixed(2);  // Intereses de cesantías
 
-    // Actualizar resultados
+    // Función para formatear los valores a millones y con separadores de miles
+    function formatToMillions(value) {
+        const number = parseFloat(value);
+        if (isNaN(number)) return '$0';
+        const formatted = number / 1000000; // Convertir a millones
+        return `$${new Intl.NumberFormat('es-CO').format(formatted)}M`; // Formato en millones
+    }
+
+    // Actualizar resultados con formato adecuado
     const results = [
-        { concept: 'Vacaciones', value: `$${vacaciones}` },
-        { concept: 'Cesantías', value: `$${cesantias}` },
-        { concept: 'Intereses de Cesantías', value: `$${interesesCesantias}` }
+        { concept: 'Vacaciones', value: formatToMillions(vacaciones) },
+        { concept: 'Cesantías', value: formatToMillions(cesantias) },
+        { concept: 'Intereses de Cesantías', value: formatToMillions(interesesCesantias) }
     ];
     
     // Actualizar tabla de resultados
     const resultsTableBody = document.getElementById('results-table-body');
-    resultsTableBody.innerHTML = '';
+    resultsTableBody.innerHTML = ''; // Limpiar los resultados previos
     results.forEach(result => {
         const row = document.createElement('tr');
         row.innerHTML = `<td>${result.concept}</td><td>${result.value}</td>`;
         resultsTableBody.appendChild(row);
     });
+
+    // Limpiar el formulario después de la acción (opcional)
+    document.getElementById('liquidation-form').reset(); // Limpia los campos de entrada después de enviar
 });
